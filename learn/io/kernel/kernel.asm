@@ -300,10 +300,15 @@ save:
 	push 	gs
 
 	; 设置段寄存器的值
+	mov  	esi, edx 
+
 	mov 	dx, ss
 	mov 	ds, dx 
 	mov 	es, dx 
-	
+	mov 	fs, dx 
+
+	mov 	edx, esi 
+
 	mov 	esi, esp 		;esi = 进程表起始地址
 
 	inc 	dword [k_reenter]
@@ -318,13 +323,19 @@ save:
 
 
 sys_call:
-		call save
-		push	dword [p_proc_ready]
+		call 	save
+
 		sti 
+		push 	esi 
+		push	dword [p_proc_ready]
+		push 	edx 
 		push	ecx
 		push	ebx	
 		call 	[sys_call_table + eax * 4]
-		add		esp, 4 * 3
+
+		add		esp, 4 * 4
+		pop 	esi 
+		
 		mov 	[esi + EAXREG - P_STACKBASE], eax 
 		
 		cli 

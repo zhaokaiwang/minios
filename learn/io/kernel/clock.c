@@ -4,14 +4,13 @@
                                     zhaokai, 2017*/
 
 #include "type.h"
-#include "const.h"
 #include "protect.h"
-#include "string.h"
 #include "proc.h"
-#include "tty.h"
-#include "console.h"
 #include "global.h"
+#include "clock.h"
 #include "proto.h"
+#include "i8259.h"
+#include "main.h"
 
 // 切换进程
 PUBLIC void clock_handler (int irq)

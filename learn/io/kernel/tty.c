@@ -5,7 +5,6 @@
 ====================================================================
 */
 #include "type.h"
-#include "const.h"
 #include "protect.h"
 #include "string.h"
 #include "proc.h"
@@ -14,9 +13,7 @@
 #include "global.h"
 #include "keyboard.h"
 #include "proto.h"
-
-#define TTY_FIRST       (tty_table)
-#define TTY_END         (tty_table + NR_CONSOLES)
+#include "tty.h"
 
 /* 函数的原型*/
 PRIVATE void init_tty(TTY* p_tty);
@@ -159,7 +156,54 @@ PUBLIC void tty_write(TTY* p_tty, char* buf, int len)
         }
 }
 
-PUBLIC int sys_write(char* buf, int len, PROCESS* p_proc)
+/********************************************************************
+ *                      sys_printx
+ * ******************************************************************/
+PUBLIC int sys_printx( int _unused1, int _unused2, char* s, struct proc* p_proc)
 {
-        tty_write(&tty_table[p_proc->nr_tty], buf, len);
-}
+        const char* p;
+        char ch; 
+        
+        char reenter_err[] = "? k_reenter is incorrect for unknown reason";
+        reenter_err[0] = MAG_CH_ASSERT;
+
+        if (k_reenter == 0) { /* run in ring<1-3>*/
+                p = va2la(proc2pid(p_proc), s);
+        } else if (k_reenter > 0) /* 内核中被调用*/
+                p = s;
+        else 
+                p = reenter_err;
+        
+        
+        /* 如果在内核中发生了assert错误的话，我们打印之后就停止我们的内核
+           如果在用户进程中的话，我们就选择在相应的控制台打印出内容，然后返回
+        */        
+        if ((*p == MAG_CH_PANIC) ||
+             (*p == MAG_CH_ASSERT && p_proc_ready < &proc_table[NR_TASKS])) {
+                disable_int();
+
+                char * v = (char*)V_MEM_BASE;
+                const char* q = p + 1;
+
+                while (v < (char*)(V_MEM_BASE + V_MEM_SIZE)){
+                        *v++ = *q++;
+                        *v++ = RED_CHAR;
+                        if (!*q) {  /* 遇到了 0 我们就需要换行*/
+                            while (((int)v - V_MEM_BASE) % (SCREEN_WIDTH * 16)){ /* 填充一行的 0*/
+                                v++;
+                                *v++ = GRAY_CHAR;
+                            }
+                            q = p + 1;
+                        }
+                }
+
+                __asm__ __volatile__("hlt");
+        }
+
+        while ((ch = *p++) != 0){
+                if (ch == MAG_CH_ASSERT || ch == MAG_CH_PANIC)
+                        continue ; /* 跳过标志位*/
+                out_char(tty_table[p_proc->nr_tty].p_console,ch);
+        }
+        return 0;
+} 

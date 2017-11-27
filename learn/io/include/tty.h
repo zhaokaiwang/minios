@@ -7,9 +7,15 @@
 #define _MINIOS_TTY_H
 #include "type.h"
 #include "console.h"
+#include "proc.h"
 
+#define NR_CONSOLES			3 /*number of consoles*/
+
+#define TTY_FIRST       (tty_table)
+#define TTY_END         (tty_table + NR_CONSOLES)
 #define TTY_IN_BYTES      256  /*TTY BUFFER SIZE */
 struct s_console;
+struct proc;
 /*tty*/
 
 typedef struct s_tty{
@@ -22,4 +28,10 @@ typedef struct s_tty{
 }TTY;
     
 
+/* 函数原型*/
+PUBLIC  void task_tty();
+PUBLIC void in_process(TTY* p_tty, u32 key);
+PUBLIC void tty_write(TTY* p_tty, char* buf, int len);
+PUBLIC void init_screen(TTY* p_tty);
+PUBLIC int sys_printx( int _unused1, int _unused2, char* s, struct proc* p_proc);
 #endif  /*TTY*/

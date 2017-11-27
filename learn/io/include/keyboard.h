@@ -6,7 +6,8 @@
 
 #ifndef	_MINIOS_KEYBOARD_H_
 #define	_MINIOS_KEYBOARD_H_
-
+#include "type.h"
+#include "tty.h"
 
 /************************************************************************/
 /*                          Macros Declaration                          */
@@ -114,6 +115,18 @@
 #define PAD_MID		PAD_5			/* Middle key	*/
 #define PAD_DEL		PAD_DOT			/* Del		*/
 
+#define LED_CODE 	0XED
+#define KB_ACK		0XFA
+
+/* AT keyboard */
+/* 8042 ports */
+#define KB_DATA		0x60	/* I/O port for keyboard data
+					Read : Read Output Buffer
+					Write: Write Input Buffer(8042 Data&8048 Command) */
+#define KB_CMD		0x64	/* I/O port for keyboard command
+					Read : Read Status Register
+					Write: Write Input Buffer(8042 Command) */
+
 
 /************************************************************************/
 /*                         Stucture Definition                          */
@@ -126,6 +139,8 @@ typedef struct s_kb {
 	char	buf[KB_IN_BYTES];	/* 缓冲区 */
 }KB_INPUT;
 
-
+PUBLIC  void keyboard_handler (int irq);
+PUBLIC  void init_keyboard();
+PUBLIC  void keyboard_read(TTY* p_tty);
 
 #endif /* _MINIOS_KEYBOARD_H_ */

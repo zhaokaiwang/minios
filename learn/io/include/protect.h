@@ -6,9 +6,10 @@
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 #ifndef	_MINIOS_PROTECT_H_
 #define	_MINIOS_PROTECT_H_
+#include "type.h"
 
 //描述符结构体
-typedef	struct s_descriptor
+typedef	struct descriptor
 {
 	u16	limit_low;
 	u16 base_low;
@@ -122,6 +123,19 @@ typedef struct s_tss {
 #define	DA_386IGate		0x8E	/* 386 中断门类型值			*/
 #define	DA_386TGate		0x8F	/* 386 陷阱门类型值			*/
 
+//GDT 和 IDT 中描述符的个数
+#define    	GDT_SIZE	128
+#define		IDT_SIZE	256
+
+/* 权限 */
+
+#define PRIVILEGE_KRNL	0
+#define	PRIVILEGE_TASK  1
+#define PRIVILEGE_USER  3
+/* RPL */
+#define	RPL_KRNL	SA_RPL0
+#define	RPL_TASK	SA_RPL1
+#define	RPL_USER	SA_RPL3
 
 /* 中断向量 */
 #define	INT_VECTOR_DIVIDE		0x0
@@ -141,6 +155,12 @@ typedef struct s_tss {
 #define	INT_VECTOR_PAGE_FAULT		0xE
 #define	INT_VECTOR_COPROC_ERR		0x10
 
+/* 每个任务有一个单独的 LDT, 每个 LDT 中的描述符个数: */
+#define LDT_SIZE		2
+/* descriptor indices in LDT */
+#define INDEX_LDT_C             0
+#define INDEX_LDT_RW            1
+
 /* 中断向量 */
 #define	INT_VECTOR_IRQ0			0x20
 #define	INT_VECTOR_IRQ8			0x28
@@ -152,4 +172,7 @@ typedef struct s_tss {
 /* 线性地址 → 物理地址 */
 #define vir2phys(seg_base, vir)	(u32)(((u32)seg_base) + (u32)(vir))
 
+PUBLIC void init_prot();
+PUBLIC u32 seg2phys(u16 seg);
+PUBLIC void exception_handler(int vec_no,int err_code,int eip,int cs,int eflags);
 #endif

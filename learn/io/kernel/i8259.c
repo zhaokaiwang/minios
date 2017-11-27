@@ -4,13 +4,13 @@
                                     zhaokai 2017
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 #include "type.h"
-#include "const.h"
 #include "protect.h"
 #include "proc.h"
 #include "tty.h"
 #include "console.h"
 #include "global.h"
 #include "proto.h"
+#include "i8259.h"
 
 // init 8259a
 // 详细情况可以看8259A简介

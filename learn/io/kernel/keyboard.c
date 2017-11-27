@@ -7,7 +7,6 @@
 
 
 #include "type.h"
-#include "const.h"
 #include "protect.h"
 #include "string.h"
 #include "proc.h"
@@ -17,7 +16,7 @@
 #include "proto.h"
 #include "keyboard.h"
 #include "keymap.h"
-
+#include "i8259.h"
 PRIVATE KB_INPUT        kb_in;
 
 PRIVATE	int	code_with_E0 = 0;

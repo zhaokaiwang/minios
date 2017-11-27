@@ -4,13 +4,8 @@
                                             zhaokai,2017
 */
 #include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "tty.h"
-#include "console.h"
-#include "string.h"
-#include "proc.h"
-#include "global.h"
+#include "printf.h"
+#include "vsprintf.h"
 #include "proto.h"
 /*格式化输入函数*/
 int printf (const char* fmt,...)
@@ -20,7 +15,8 @@ int printf (const char* fmt,...)
 
     va_list arg = (va_list)((char*) (&fmt) + 4);
     i = vsprintf(buf, fmt, arg);
-    write (buf, i);
+    buf[i] = 0;
+    printx(buf);
     
     return i;
 }

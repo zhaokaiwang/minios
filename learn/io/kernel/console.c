@@ -5,7 +5,6 @@
 ====================================================================
 */
 #include "type.h"
-#include "const.h"
 #include "protect.h"
 #include "string.h"
 #include "proc.h"
